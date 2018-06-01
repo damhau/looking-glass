@@ -28,7 +28,7 @@ final class Cisco extends Router {
 
     if (match_hostname($destination) || match_ipv6($destination) ||
         match_ipv4($destination)) {
-      $ping = 'ping '.$destination.' repeat 10';
+      $ping = 'ping vrf NET5 '.$destination.' repeat 10';
     } else {
       throw new Exception('The parameter is not an IP address or a hostname.');
     }
@@ -45,7 +45,7 @@ final class Cisco extends Router {
 
     if (match_ipv6($destination) || match_ipv4($destination) ||
         (match_hostname($destination) && !$this->has_source_interface_id())) {
-      $traceroute = 'traceroute '.$destination;
+      $traceroute = 'traceroute vrf NET5 '.$destination;
     } else if (match_hostname($destination)) {
       $hostname = $destination;
       $destination = hostname_to_ip_address($hostname);
@@ -55,9 +55,9 @@ final class Cisco extends Router {
       }
 
       if (match_ipv6($destination)) {
-        $traceroute = 'traceroute ipv6 '.(isset($hostname) ? $hostname : $destination);
+        $traceroute = 'traceroute vrf NET5 ipv6 '.(isset($hostname) ? $hostname : $destination);
       } else if (match_ipv4($destination)) {
-        $traceroute = 'traceroute ip '.(isset($hostname) ? $hostname : $destination);
+        $traceroute = 'traceroute vrf NET5 ip '.(isset($hostname) ? $hostname : $destination);
       } else {
         throw new Exception('The parameter does not resolve to an IP address.');
       }
@@ -81,7 +81,7 @@ final class Cisco extends Router {
         if (match_ipv6($parameter, false)) {
           $commands[] = 'show bgp ipv6 unicast '.$parameter;
         } else if (match_ipv4($parameter, false)) {
-          $commands[] = 'show bgp ipv4 unicast '.$parameter;
+          $commands[] = 'show bgp vpnv4 unicast vrf NET5 '.$parameter;
         } else {
           throw new Exception('The parameter is not an IP address.');
         }
@@ -94,7 +94,7 @@ final class Cisco extends Router {
               '"';
           }
           if (!$this->config['disable_ipv4']) {
-            $commands[] = 'show bgp ipv4 unicast quote-regexp "'.$parameter.
+            $commands[] = 'show bgp vpnv4 unicast vrf NET5 quote-regexp "'.$parameter.
               '"';
           }
         } else {
@@ -109,7 +109,7 @@ final class Cisco extends Router {
               '_"';
           }
           if (!$this->config['disable_ipv4']) {
-            $commands[] = 'show bgp ipv4 unicast quote-regexp "^'.$parameter.
+            $commands[] = 'show bgp vpnv4 unicast vrf NET5 quote-regexp "^'.$parameter.
               '_"';
           }
         } else {
